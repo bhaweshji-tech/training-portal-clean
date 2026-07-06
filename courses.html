@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses - Training Portal</title>
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* Basic styling for your course grid layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .header-section {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .back-btn {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .course-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .course-card h3 {
+            margin-top: 0;
+            color: #222;
+        }
+        .course-card p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .course-link {
+            background-color: #0070f3;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 15px;
+            display: block;
+        }
+        .course-link:hover {
+            background-color: #0051a8;
+        }
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="index.html" class="back-btn">← Back to Categories</a>
+        
+        <div class="header-section">
+            <h1 id="tech-title">Loading Courses...</h1>
+            <p>Explore your selected technology courses below.</p>
+        </div>
+
+        <div id="loading-text" class="loading">Fetching data from Supabase...</div>
+        <div id="course-container" class="course-grid"></div>
+    </div>
+
+    <script>
+        // 1. Grab Vercel Environment Variables dynamically, or fallback safely
+        // Replace the placeholders below ONLY if testing locally. On Vercel, it connects via your setup.
+        const SUPABASE_URL = window.env?.SUPABASE_URL || "YOUR_SUPABASE_PROJECT_URL_HERE"; 
+        const SUPABASE_ANON_KEY = window.env?.SUPABASE_ANON_KEY || "YOUR_SUPABASE_ANON_KEY_HERE";
+
+        // Initialize Supabase Client
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 2. Get the chosen technology category from the URL string (?tech=Docker)
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedTech = urlParams.get('tech');
+
+        async function fetchCourses() {
+            if (!selectedTech) {
+                document.getElementById('tech-title').innerText = "No Technology Selected";
+                document.getElementById('loading-text').style.display = 'none';
+                return;
+            }
+
+            // Update title heading with the chosen tech
+            document.getElementById('tech-title').innerText = selectedTech + " Courses";
+
+            // 3. Query your 'trainingdata' table, filtering rows where the 'tech' column matches our url variable
+            const { data: courses, error } = await supabase
+                .from('trainingdata')
+                .select('title, desc, tech, link')
+                .eq('tech', selectedTech);
+
+            // Hide loading text
+            document.getElementById('loading-text').style.display = 'none';
+
+            if (error) {
+                console.error("Error fetching data:", error);
+                document.getElementById('tech-title').innerText = "Error loading data.";
+                return;
+            }
+
+            const container = document.getElementById('course-container');
+
+            if (courses.length === 0) {
+                container.innerHTML = `<p class="loading">No courses found for ${selectedTech} yet.</p>`;
+                return;
+            }
+
+            // 4. Loop through the matching rows and build HTML cards dynamically
+            courses.forEach(course => {
+                const card = document.createElement('div');
+                card.className = 'course-card';
+                card.innerHTML = `
+                    <div>
+                        <h3>${course.title}</h3>
+                        <p>${course.desc || 'No description provided.'}</p>
+                    </div>
+                    <a href="${course.link}" target="_blank" class="course-link">View Course</a>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Run the function when page loads
+        fetchCourses();
+    </script>
+</body>
+</html>
