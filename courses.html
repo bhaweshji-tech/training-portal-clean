@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courses - Training Portal</title>
-    <!-- Keep stylesheet reference standard -->
     <link rel="stylesheet" href="css/style.css">
     
-    <!-- Supabase CDN Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -90,14 +88,14 @@
     </div>
 
     <script>
-        // STEP 1: Put your actual Supabase URL and public anon key inside the quotes below!
-        const SUPABASE_URL = "https://gsdblteofsongnjdjhpc.supabase.co"; 
-        const SUPABASE_ANON_KEY = "sb_publishable_u9dNq32zPDAFOO415PArvQ_ljzEEiaC";
+        // STEP 1: Provide your actual Supabase credentials below
+        const DB_URL = "https://gsdblteofsongnjdjhpc.supabase.co"; 
+        const DB_ANON_KEY = "sb_publishable_u9dNq32zPDAFOO415PArvQ_ljzEEiaC";
 
-        // Initialize Supabase
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Fixed Initialization: Using window.supabase to resolve library reference conflict
+        const supabaseClient = window.supabase.createClient(DB_URL, DB_ANON_KEY);
 
-        // Get parameters from URL
+        // Get parameters from URL query string (?tech=Docker)
         const urlParams = new URLSearchParams(window.location.search);
         const selectedTech = urlParams.get('tech');
 
@@ -108,12 +106,12 @@
                 return;
             }
 
-            // Immediately change title so the user knows what branch they are looking at
+            // Immediately apply title update
             document.getElementById('tech-title').innerText = selectedTech + " Courses";
 
             try {
-                // Query database
-                const { data: courses, error } = await supabase
+                // Query table data
+                const { data: courses, error } = await supabaseClient
                     .from('trainingdata')
                     .select('title, desc, tech, link')
                     .eq('tech', selectedTech);
