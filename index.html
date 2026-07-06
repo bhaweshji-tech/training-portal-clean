@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Portal - Home</title>
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* Clean Layout Styling for your Tech Categories */
+        .portal-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .portal-header {
+            margin-bottom: 50px;
+        }
+        .portal-header h1 {
+            font-size: 2.5rem;
+            color: #111;
+            margin-bottom: 10px;
+        }
+        .portal-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .tech-card {
+            background: #ffffff;
+            border: 1px solid #e1e1e1;
+            border-radius: 12px;
+            padding: 35px 20px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        /* Hover animation to make it interactive */
+        .tech-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-color: #0070f3;
+        }
+        .tech-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .tech-card h2 {
+            margin: 10px 0 0 0;
+            font-size: 1.5rem;
+            color: #222;
+        }
+        .tech-card p {
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-container">
+        <div class="portal-header">
+            <h1>Welcome to Your Training Portal</h1>
+            <p>Select a technology domain below to view your available courses.</p>
+        </div>
+
+        <div class="tech-grid">
+            
+            <a href="courses.html?tech=GitHub" class="tech-card">
+                <div class="tech-icon">🐙</div>
+                <h2>GitHub</h2>
+                <p>Learn version control, repositories, actions, and code collaboration management.</p>
+            </a>
+
+            <a href="courses.html?tech=Docker" class="tech-card">
+                <div class="tech-icon">🐋</div>
+                <h2>Docker</h2>
+                <p>Master containerization basics, Dockerfile building, compose, and hub networking.</p>
+            </a>
+
+            <a href="courses.html?tech=Kubernetes" class="tech-card">
+                <div class="tech-icon">☸️</div>
+                <h2>Kubernetes</h2>
+                <p>Explore production cluster management, service orchestration, pods, and nodes.</p>
+            </a>
+
+            <a href="courses.html?tech=DevOps" class="tech-card">
+                <div class="tech-icon">🚀</div>
+                <h2>DevOps</h2>
+                <p>Dive into continuous integration, automated infrastructure pipelines, and deployments.</p>
+            </a>
+
+        </div>
+    </div>
+
+</body>
+</html>
