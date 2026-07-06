@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courses - Training Portal</title>
+    <!-- Keep stylesheet reference standard -->
     <link rel="stylesheet" href="css/style.css">
     
+    <!-- Supabase CDN Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* Basic styling for your course grid layout */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -89,15 +90,14 @@
     </div>
 
     <script>
-        // 1. Grab Vercel Environment Variables dynamically, or fallback safely
-        // Replace the placeholders below ONLY if testing locally. On Vercel, it connects via your setup.
-        const SUPABASE_URL = window.env?.SUPABASE_URL || "https://gsdblteofsongnjdjhpc.supabase.co"; 
-        const SUPABASE_ANON_KEY = window.env?.SUPABASE_ANON_KEY || "sb_publishable_u9dNq32zPDAFOO415PArvQ_ljzEEiaC";
+        // STEP 1: Put your actual Supabase URL and public anon key inside the quotes below!
+        const SUPABASE_URL = "https://gsdblteofsongnjdjhpc.supabase.co"; 
+        const SUPABASE_ANON_KEY = "sb_publishable_u9dNq32zPDAFOO415PArvQ_ljzEEiaC";
 
-        // Initialize Supabase Client
+        // Initialize Supabase
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 2. Get the chosen technology category from the URL string (?tech=Docker)
+        // Get parameters from URL
         const urlParams = new URLSearchParams(window.location.search);
         const selectedTech = urlParams.get('tech');
 
@@ -108,47 +108,51 @@
                 return;
             }
 
-            // Update title heading with the chosen tech
+            // Immediately change title so the user knows what branch they are looking at
             document.getElementById('tech-title').innerText = selectedTech + " Courses";
 
-            // 3. Query your 'trainingdata' table, filtering rows where the 'tech' column matches our url variable
-            const { data: courses, error } = await supabase
-                .from('trainingdata')
-                .select('title, desc, tech, link')
-                .eq('tech', selectedTech);
+            try {
+                // Query database
+                const { data: courses, error } = await supabase
+                    .from('trainingdata')
+                    .select('title, desc, tech, link')
+                    .eq('tech', selectedTech);
 
-            // Hide loading text
-            document.getElementById('loading-text').style.display = 'none';
+                document.getElementById('loading-text').style.display = 'none';
 
-            if (error) {
-                console.error("Error fetching data:", error);
-                document.getElementById('tech-title').innerText = "Error loading data.";
-                return;
+                if (error) {
+                    console.error("Database Error:", error);
+                    document.getElementById('loading-text').innerText = "Error loading table data: " + error.message;
+                    document.getElementById('loading-text').style.display = 'block';
+                    return;
+                }
+
+                const container = document.getElementById('course-container');
+
+                if (!courses || courses.length === 0) {
+                    container.innerHTML = `<p class="loading">No courses found for ${selectedTech} yet.</p>`;
+                    return;
+                }
+
+                courses.forEach(course => {
+                    const card = document.createElement('div');
+                    card.className = 'course-card';
+                    card.innerHTML = `
+                        <div>
+                            <h3>${course.title}</h3>
+                            <p>${course.desc || 'No description provided.'}</p>
+                        </div>
+                        <a href="${course.link}" target="_blank" class="course-link">View Course</a>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error("System connection error:", err);
+                document.getElementById('loading-text').innerText = "Failed to connect to Supabase network setup.";
             }
-
-            const container = document.getElementById('course-container');
-
-            if (courses.length === 0) {
-                container.innerHTML = `<p class="loading">No courses found for ${selectedTech} yet.</p>`;
-                return;
-            }
-
-            // 4. Loop through the matching rows and build HTML cards dynamically
-            courses.forEach(course => {
-                const card = document.createElement('div');
-                card.className = 'course-card';
-                card.innerHTML = `
-                    <div>
-                        <h3>${course.title}</h3>
-                        <p>${course.desc || 'No description provided.'}</p>
-                    </div>
-                    <a href="${course.link}" target="_blank" class="course-link">View Course</a>
-                `;
-                container.appendChild(card);
-            });
         }
 
-        // Run the function when page loads
         fetchCourses();
     </script>
 </body>
